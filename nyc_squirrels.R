@@ -20,6 +20,8 @@ behavior_df <- subset(nyc_squirrels, select=c('running', 'chasing', 'climbing', 
 
 head(location_df)
 
+### ToDo: remove NA values and run the summaries again
+
 summary(location_df)
 summary(features_df)
 summary(behavior_df)
@@ -32,11 +34,19 @@ summary(behavior_df)
 # histogram:
 library(ggplot2)
 
-df <- data.frame(features_df$age)
-age_summary <- summary(df)
-df2 <- data.frame(age_summary)
-### I'm HERE!
-ggplot(df2, aes(x=age_summary)) + geom_histogram(color="black", fill="blue") # NOT WORKING
+### ToDo: remove NA values
+ggplot(data=features_df, aes(x=age)) + geom_bar(color="black", fill="blue")
+ggplot(data=features_df, aes(x=highlight_fur_color)) + geom_bar(color="black", fill="grey") # rearrange variables, change colors
+ggplot(data=features_df, aes(x=primary_fur_color)) + geom_bar(color="black", fill="beige")
 
 age_summary
 
+# plot:
+#   bar plot:
+#     coat colors (bar=color)
+#     most frequent sightings
+#     different behaviors
+#   histogram:
+#     age
+#   heatmap:
+#     behavior (avoid/approach) vs age
