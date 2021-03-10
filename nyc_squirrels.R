@@ -161,3 +161,54 @@ behavior_freq
 #     age
 #   heatmap:
 #     behavior (avoid/approach) vs age
+
+
+# time:
+#   # change date format
+#   # binning >>> spring, summer, fall, winter
+#   # am/pm + 4 seasons >>>
+#   # at what time where the squirrels more frequently sighted? did it depend on the season?
+
+
+# location:
+#   # where were the squirrels most frequently sighted?:
+#     # park/city - am most frequent location/pm most frequent location
+#     # does it depend on the season? on the time of day?
+#     # what behaviors are associated with the different locations?:
+#       # kuks + etc vs location
+#       # approach/avoid humans vs location
+#       # above ground vs location
+
+
+# features:
+#   # what coat + highlight is the most frequent? what species is that?
+#   # is there a correlation between age and fur color sighted?
+#   # for color and location >>> is it correlated? i.e., are cinnamon squirrels more
+#   # frequently seen in the park and grey squirrels in the city or viceversa or
+#   # is it unrelated? >>> that would mean different behaviors would be associated
+#   # with the species
+#   # fur color vs behavior >>> heatmap
+#   # age vs behavior >>> heatmap
+
+
+# behavior:
+#   # which behaviors were recorded? which ones were more frequent? when? (am/pm - month)
+#   # behavior vs city/park
+#   # where do the squirrels eat? can I find that in this dataset?
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
