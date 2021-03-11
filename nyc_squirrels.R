@@ -67,6 +67,59 @@ time_df$date <- as.character(time_df$date)
 time_df$date <- as.Date(time_df$date, "%m/%d/%Y") # >>> this line doesn't work
 
 
+# https://thomasleeper.com/Rcourse/Tutorials/stringmanipulation.html
+
+
+date <- nyc_squirrels$date
+
+
+nyc_squirrels$date <- as.character(nyc_squirrels$date)
+
+
+
+one_day <- nyc_squirrels$date[1]
+
+# NEXT, create a function like this:
+for value in date: # change this to R
+  day <- substr(one_day, 3, 4)
+  month <- substr(one_day, 1, 2)
+  year <- substr(one_day, 5, 8)
+  
+  one_day_date_format <- paste(month, day, year, sep="/")
+  
+  replace values in nyc_squirrels$date  # this is the Return statement (apply???)
+  
+  
+
+
+
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# STUDY THIS: (then remove from here)
+
+# NOT RUN {
+substr("abcdef", 2, 4)
+substring("abcdef", 1:6, 1:6)
+## strsplit is more efficient ...
+
+substr(rep("abcdef", 4), 1:4, 4:5)
+x <- c("asfef", "qwerty", "yuiop[", "b", "stuff.blah.yech")
+substr(x, 2, 5)
+substring(x, 2, 4:6)
+
+substring(x, 2) <- c("..", "+++")
+x
+# }
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+
+
+
 
 ### ToDo: remove NA values and run the summaries again
 
