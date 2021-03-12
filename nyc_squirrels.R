@@ -72,26 +72,60 @@ time_df$date <- as.Date(time_df$date, "%m/%d/%Y") # >>> this line doesn't work
 
 date <- nyc_squirrels$date
 
-
+# change nyc_squirrels$date data type to character
 nyc_squirrels$date <- as.character(nyc_squirrels$date)
 
 
-
+# for the first row:
 one_day <- nyc_squirrels$date[1]
 
-# NEXT, create a function like this:
-for value in date: # change this to R
-  day <- substr(one_day, 3, 4)
-  month <- substr(one_day, 1, 2)
-  year <- substr(one_day, 5, 8)
+day <- substr(one_day, 3, 4)
+month <- substr(one_day, 1, 2)
+year <- substr(one_day, 5, 8)
+
+one_day_date_format <- paste(month, day, year, sep="/")
+
+# my function: apply(data_frame, 1, function, arguments_to_function_if_any)
+
+x <- nyc_squirrels$date[2]
+ 
+add_slash <- function(x){
+  day <- substr(x, 3, 4)
+  month <- substr(x, 1, 2)
+  year <- substr(x, 5, 8)
   
   one_day_date_format <- paste(month, day, year, sep="/")
-  
-  replace values in nyc_squirrels$date  # this is the Return statement (apply???)
-  
-  
+}
+
+w <- add_slash(x)
+nyc_squirrels$date[2] <- w
+
+apply(nyc_squirrels, 1, add_slash, what_goes_here???)
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# STUDY THIS: (then remove from here)
 
 
+# Learn R program to apply a function for each row in r data frame
+
+# R Data Frame
+celebrities = data.frame(name = c("Andrew", "Mathew", "Dany", "Philip", "John", "Bing", "Monica"),
+                         age = c(28, 23, 49, 29, 38, 23, 29),
+                         income = c(25.2, 10.5, 11, 21.9, 44, 11.5, 45))
+
+# R function
+f = function(x, output) {
+  # x is the row of type Character
+  # access element in first column
+  name = x[1]
+  # access element in second column
+  income = x[3]
+  #your code to process x
+  cat(name, income, "\n")
+}
+
+#apply(X, MARGIN, FUN, …)
+apply(celebrities, 1, f)
 
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
