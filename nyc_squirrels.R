@@ -24,11 +24,29 @@ library(dplyr) # I need dplyr to use filter function
 
 nyc_squirrels <- read.csv('nyc_squirrels.csv')
 
-nrow(nyc_squirrels) # 3023
-ncol(nyc_squirrels) # 36
+# Change nyc_squirrels$date data type from integer to date:
+
+### change nyc_squirrels$date data type to character
+nyc_squirrels$date <- as.character(nyc_squirrels$date)
+
+### define function add_slash: takes the date in format: "10142018" (class Character)
+### and returns it in format: "10/14/2018" (class Character) 
+add_slash <- function(x){
+  day <- substr(x, 3, 4)
+  month <- substr(x, 1, 2)
+  year <- substr(x, 5, 8)
+  
+  return <- paste(month, day, year, sep="/")
+}
+
+new_date <- apply(nyc_squirrels[,6,drop=F], 1, add_slash)   # >>> nyc_squirrels[,6,drop=F] >>> here 'drop=F' prevents R from changing the dimensions of the object
+nyc_squirrels$date <- new_date
+
+### finally, change data type from 'Character' to 'Date'
+nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%Y/%m/%d")
+class(nyc_squirrels$date) # "Date"
 
 # I create 4 subsets based on category: location, features, behavior and time.
-
 location_df <- subset(nyc_squirrels, select=c('long', 'lat', 'lat_long',
                                               'hectare', 'location', 
                                               'above_ground_sighter_measurement', 
@@ -60,93 +78,6 @@ behavior_df <- subset(nyc_squirrels, select=c('running', 'chasing', 'climbing',
 time_df <- subset(nyc_squirrels, select=c('shift', 'date'))
 summary(time_df)  #  AM:1347 - PM:1676
 
-time_df$date <- as.character(time_df$date)
-
-# I need to write a function (+ apply to loop through all rows) to add '/' to all dates, so I can use as.Date
-# to change the data type like this: as.Date(time_df$date, "%m/%d/%Y")
-time_df$date <- as.Date(time_df$date, "%m/%d/%Y") # >>> this line doesn't work
-
-
-# https://thomasleeper.com/Rcourse/Tutorials/stringmanipulation.html
-
-
-date <- nyc_squirrels$date
-
-# change nyc_squirrels$date data type to character
-nyc_squirrels$date <- as.character(nyc_squirrels$date)
-
-
-# for the first row:
-one_day <- nyc_squirrels$date[1]
-
-day <- substr(one_day, 3, 4)
-month <- substr(one_day, 1, 2)
-year <- substr(one_day, 5, 8)
-
-one_day_date_format <- paste(month, day, year, sep="/")
-
-# my function: apply(data_frame, 1, function, arguments_to_function_if_any)
-
-x <- nyc_squirrels$date[2]
- 
-add_slash <- function(x){
-  day <- substr(x, 3, 4)
-  month <- substr(x, 1, 2)
-  year <- substr(x, 5, 8)
-  
-  one_day_date_format <- paste(month, day, year, sep="/")
-}
-
-w <- add_slash(x)
-nyc_squirrels$date[2] <- w
-
-apply(nyc_squirrels, 1, add_slash, what_goes_here???)
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-# STUDY THIS: (then remove from here)
-
-
-# Learn R program to apply a function for each row in r data frame
-
-# R Data Frame
-celebrities = data.frame(name = c("Andrew", "Mathew", "Dany", "Philip", "John", "Bing", "Monica"),
-                         age = c(28, 23, 49, 29, 38, 23, 29),
-                         income = c(25.2, 10.5, 11, 21.9, 44, 11.5, 45))
-
-# R function
-f = function(x, output) {
-  # x is the row of type Character
-  # access element in first column
-  name = x[1]
-  # access element in second column
-  income = x[3]
-  #your code to process x
-  cat(name, income, "\n")
-}
-
-#apply(X, MARGIN, FUN, …)
-apply(celebrities, 1, f)
-
-
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-# STUDY THIS: (then remove from here)
-
-# NOT RUN {
-substr("abcdef", 2, 4)
-substring("abcdef", 1:6, 1:6)
-## strsplit is more efficient ...
-
-substr(rep("abcdef", 4), 1:4, 4:5)
-x <- c("asfef", "qwerty", "yuiop[", "b", "stuff.blah.yech")
-substr(x, 2, 5)
-substring(x, 2, 4:6)
-
-substring(x, 2) <- c("..", "+++")
-x
-# }
-
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
 
