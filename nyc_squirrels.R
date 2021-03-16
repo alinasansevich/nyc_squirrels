@@ -38,13 +38,21 @@ add_slash <- function(x){
   
   return <- paste(month, day, year, sep="/")
 }
-
-new_date <- apply(nyc_squirrels[,6,drop=F], 1, add_slash)   # >>> nyc_squirrels[,6,drop=F] >>> here 'drop=F' prevents R from changing the dimensions of the object
+### change each date value with apply add_slash
+new_date <- apply(nyc_squirrels[,6,drop=F], 1, add_slash)  # >>> nyc_squirrels[,6,drop=F] >>> here 'drop=F' prevents R from changing the dimensions of the object
 nyc_squirrels$date <- new_date
 
 ### finally, change data type from 'Character' to 'Date'
-nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%Y/%m/%d")
-class(nyc_squirrels$date) # "Date"
+nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%m/%d/%Y")
+# class(nyc_squirrels$date) # "Date"
+
+
+
+
+
+
+
+
 
 # I create 4 subsets based on category: location, features, behavior and time.
 location_df <- subset(nyc_squirrels, select=c('long', 'lat', 'lat_long',
@@ -80,13 +88,7 @@ summary(time_df)  #  AM:1347 - PM:1676
 
 
 
-
-
-
-
-
-
-### ToDo: remove NA values and run the summaries again
+### ToDo: remove NA values and run the summaries again >>> Y/N?
 
 summary(location_df)
 
@@ -133,8 +135,12 @@ summary(features_df)
 features_df[features_df == "?" ] <- NA  # change '?' to NA
 summary(features_df$age)
 # create bar plot to show age frequencies:
-ggplot(data=features_df, aes(x=age)) + geom_bar(color="black", fill="blue")
+library(ggthemes)
+p <- ggplot(data=features_df, aes(x=age)) +
+  geom_bar(color="black", fill="#000000") +
+  theme_hc()
 
+p
 ### 4. coat colors
 
 df[!is.na(df$B), ]
@@ -146,9 +152,24 @@ p <- ggplot(data=features_df_fur_na, aes(x=primary_fur_color, fill=primary_fur_c
   geom_bar() + 
   scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
   labs(x="Primary Fur Color", y="Count") +
-  theme(legend.position="none")        # + labs(fill = "Primary Fur Color")
-  
+  theme(legend.position="none") + # + labs(fill = "Primary Fur Color")
+  theme_hc() ##### ToDo: change the legend's name! Or remove legend!
+
 p
+
+# theme_fivethirtyeight() # >>> this theme changes the x and y labels, and takes the column name for the x label
+# theme_economist() # >>> this theme places the legend above, doesn't look good either
+# theme_tufte() # >>> maybe?... Times New Roman fonts...
+# theme_stata() # this one gives too much importance to the label...
+# theme_hc() # this one is a keeper! :) BUT I need to change the legend's name...
+
+# https://www.datanovia.com/en/blog/ggplot-themes-gallery/
+
+
+# theme_tufte(): a minimalist theme
+# theme_economist(): theme based on the plots in the economist magazine
+# theme_stata(): theme based on stata graph schemes.
+# theme_hc(): theme based on Highcharts JS
 
 
 # black=#000000
