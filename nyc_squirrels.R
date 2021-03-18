@@ -17,14 +17,60 @@
 
 #########################################################
 
-#library(readr) ?????????????   XXXXXXXXX Do I need this?
+library(readr)
 library(ggplot2)
-library(dplyr) # I need dplyr to use filter function
+library(dplyr)
 
-
+##### 1) load the dataset
 nyc_squirrels <- read.csv('nyc_squirrels.csv')
 
-# Change nyc_squirrels$date data type from integer to date:
+##### 2) check str, stats, NAs, data types...
+str(nyc_squirrels)
+
+# 'data.frame':	3023 obs. of  36 variables:
+# $ long                                      : num  -74 -74 -74 -74 -74 ...
+# $ lat                                       : num  40.8 40.8 40.8 40.8 40.8 ...
+# $ unique_squirrel_id                        : Factor w/ 3018 levels "10A-AM-1006-01",..: 1913 1903 1298 2566 2046 1644 2678 1747 2707 1531 ...
+# $ hectare                                   : Factor w/ 339 levels "01A","01B","01C",..: 292 291 14 40 306 258 52 271 56 246 ...
+# $ shift                                     : Factor w/ 2 levels "AM","PM": 2 2 1 2 1 1 2 2 1 2 ...
+# $ date                                      : int  CHANGE DATA TYPE
+# $ hectare_squirrel_number                   : int  3 3 3 5 1 2 2 3 9 14 ...
+# $ age                                       : Factor w/ 3 levels "?","Adult","Juvenile": CHECK FOR NAs, UNIFY "?" AND NAs
+# $ primary_fur_color                         : Factor w/ 3 levels "Black","Cinnamon",..: NA 3 2 3 NA 3 3 3 3 3 ...
+# $ highlight_fur_color                       : Factor w/ 10 levels "Black","Black, Cinnamon",..: NA 5 NA NA NA 5 NA 5 NA NA ...
+# $ combination_of_primary_and_highlight_color: Factor w/ 22 levels "+","Black+","Black+Cinnamon",..: 1 20 8 15 1 20 15 20 15 15 ...
+# $ color_notes                               : Factor w/ 135 levels "!!!","\"Brown\" written in as Primary",..: NA NA NA NA NA NA NA NA NA 89 ...
+# $ location                                  : Factor w/ 2 levels "Above Ground",..: NA 2 1 1 1 2 2 2 2 NA ...
+# $ above_ground_sighter_measurement          : Factor w/ 41 levels "0","1","10","100",..: NA 41 26 21 NA 41 41 41 41 NA ...
+# $ specific_location                         : Factor w/ 304 levels "\"FIELD\"","(white oak)",..: NA NA NA NA NA NA NA NA NA NA ...
+# $ running                                   : logi  FALSE TRUE FALSE FALSE FALSE FALSE ...
+# $ chasing                                   : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ climbing                                  : logi  FALSE FALSE TRUE TRUE FALSE FALSE ...
+# $ eating                                    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ foraging                                  : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ other_activities                          : Factor w/ 307 levels "#7 & #8 chased each other up diff tree",..: NA NA NA NA 286 307 NA NA NA NA ...
+# $ kuks                                      : logi  FALSE FALSE FALSE FALSE TRUE FALSE ...
+# $ quaas                                     : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ moans                                     : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ tail_flags                                : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ tail_twitches                             : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ approaches                                : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+# $ indifferent                               : logi  FALSE FALSE TRUE FALSE FALSE FALSE ...
+# $ runs_from                                 : logi  FALSE TRUE FALSE TRUE FALSE FALSE ...
+# $ other_interactions                        : Factor w/ 197 levels "(me)","acknowledged",..: NA 111 NA NA NA NA NA NA NA NA ...
+# $ lat_long                                  : Factor w/ 3023 levels "POINT (-73.9497217674555 40.796517007214)",..: 293 401 2697 2554 656 350 2114 765 2728 701 ...
+# $ zip_codes                                 : int  NA NA NA NA NA NA NA NA NA NA ...
+# $ community_districts                       : int  19 19 19 19 19 19 19 19 19 19 ...
+# $ borough_boundaries                        : int  4 4 4 4 4 4 4 4 4 4 ...
+# $ city_council_districts                    : int  19 19 19 19 19 19 19 19 19 19 ...
+# $ police_precincts                          : int  13 13 13 13 13 13 13 13 13 13 ...
+
+########## This dataset contains data that could be separated in 4 subsets based on category:
+########## location, features, behavior and time. I will base my analysis on these 4 categories of information. 
+########## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+########## from str(nyc_squirrels):
+########## At first sight, I find that I need to change nyc_squirrels$date's data type from integer to date
 
 ### change nyc_squirrels$date data type to character
 nyc_squirrels$date <- as.character(nyc_squirrels$date)
@@ -46,6 +92,69 @@ nyc_squirrels$date <- new_date
 nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%m/%d/%Y")
 # class(nyc_squirrels$date) # "Date"
 
+########## For nyc_squirrels$age, I need to unify formats, "?" + NAs = NAs
+class(nyc_squirrels$age) # factor, Levels: ? Adult Juvenile
+summary(nyc_squirrels$age)
+#        ?    Adult Juvenile     NA's 
+#        4     2568      330      121 
+
+### First I tried this line, it will change '?' to NA, but it doesn't change the factor's level
+nyc_squirrels[nyc_squirrels$age == "?" ] <- NA
+
+### So, I need to change the factor level from "?" to NA
+levels(nyc_squirrels$age)[levels(nyc_squirrels$age) == '?'] <- NA
+summary(nyc_squirrels$age)
+#    Adult Juvenile     NA's 
+#     2568      330      125 
+
+
+### find which columns have NA values, and count them
+na_totals <- colSums(is.na(nyc_squirrels))  # I could also use: sapply(nyc_squirrels, function(x) sum(is.na(x)))
+index <- na_totals != 0
+cols_w_na <- na_totals[index]
+cols_w_na
+# age                primary_fur_color              highlight_fur_color 
+# 125                               55                             1086 
+# color_notes                         location above_ground_sighter_measurement 
+# 2841                               64                              114 
+# specific_location                 other_activities               other_interactions 
+# 2547                             2586                             2783 
+# zip_codes 
+# 3014 
+
+########## highlight_fur_color has many NAs but it's informative, I'll keep it.
+
+########## I see that there are a few columns that have very little information:
+########## I choose to keep the ones related to location and behavior because they may still be useful:
+# nyc_squirrels$other_activities
+# nyc_squirrels$other_interactions
+# nyc_squirrels$specific_location
+
+########## I drop 'color_notes' (it's not of much use) and 'zip_codes' (it has only 9 non-NA values):
+# nyc_squirrels$color_notes 
+# nyc_squirrels$zip_codes
+nyc_squirrels <- select(nyc_squirrels, -c(color_notes, zip_codes)) # column names without ""!
+
+
+########## I'M HERE!!!!!!!!!!!!!!!!!!
+########## 
+########## Continue with binning: for nyc_squirrels$date, create 4 bins == 4 seasons
+########## 
+########## Do I need any dummy_variables? I think not, but check..
+########## 
+########## With that I would complete the data wrangling step of my analysis.
+########## 
+
+
+# features:
+#   # what coat + highlight is the most frequent? what species is that?
+#   # is there a correlation between age and fur color sighted?
+#   # for color and location >>> is it correlated? i.e., are cinnamon squirrels more
+#   # frequently seen in the park and grey squirrels in the city or viceversa or
+#   # is it unrelated? >>> that would mean different behaviors would be associated
+#   # with the species
+#   # fur color vs behavior >>> heatmap
+#   # age vs behavior >>> heatmap
 
 
 
@@ -156,7 +265,7 @@ p <- ggplot(data=features_df_fur_na, aes(x=primary_fur_color, fill=primary_fur_c
   theme_hc() ##### ToDo: change the legend's name! Or remove legend!
 
 p
-
+################ themes...
 # theme_fivethirtyeight() # >>> this theme changes the x and y labels, and takes the column name for the x label
 # theme_economist() # >>> this theme places the legend above, doesn't look good either
 # theme_tufte() # >>> maybe?... Times New Roman fonts...
@@ -201,6 +310,16 @@ behavior_freq
 #   heatmap:
 #     behavior (avoid/approach) vs age
 
+# features:
+#   # what coat + highlight is the most frequent? what species is that?
+#   # is there a correlation between age and fur color sighted?
+#   # for color and location >>> is it correlated? i.e., are cinnamon squirrels more
+#   # frequently seen in the park and grey squirrels in the city or viceversa or
+#   # is it unrelated? >>> that would mean different behaviors would be associated
+#   # with the species
+#   # fur color vs behavior >>> heatmap
+#   # age vs behavior >>> heatmap
+
 
 # time:
 #   # change date format
@@ -219,15 +338,7 @@ behavior_freq
 #       # above ground vs location
 
 
-# features:
-#   # what coat + highlight is the most frequent? what species is that?
-#   # is there a correlation between age and fur color sighted?
-#   # for color and location >>> is it correlated? i.e., are cinnamon squirrels more
-#   # frequently seen in the park and grey squirrels in the city or viceversa or
-#   # is it unrelated? >>> that would mean different behaviors would be associated
-#   # with the species
-#   # fur color vs behavior >>> heatmap
-#   # age vs behavior >>> heatmap
+
 
 
 # behavior:
