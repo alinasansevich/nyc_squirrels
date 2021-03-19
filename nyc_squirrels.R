@@ -145,6 +145,28 @@ nyc_squirrels <- select(nyc_squirrels, -c(color_notes, zip_codes)) # column name
 ########## With that I would complete the data wrangling step of my analysis.
 ########## 
 
+library(lubridate)
+
+seasons <- c('Spring', 'Summer', 'Fall', 'Winter')
+
+class(nyc_squirrels$date[1])
+
+month(nyc_squirrels$date[1])
+
+# seasons = []
+# 
+# for i in range(len(nyc_squirrels)):
+#   if month(nyc_squirrels$date[i]) in [3, 4, 5]:
+#   seasons.append('Spring')
+# if month(nyc_squirrels$date[i]) in [6, 7, 8]:
+#   seasons.append('Summer')
+# if month(nyc_squirrels$date[i]) in [9, 10, 11]:
+#   seasons.append('Fall')
+# if month(nyc_squirrels$date[i]) in [12, 1, 2]:
+#   seasons.append('Winter')
+# 
+# cbind(nyc_squirrels, seasons)
+
 
 # features:
 #   # what coat + highlight is the most frequent? what species is that?
