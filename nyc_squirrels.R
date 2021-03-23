@@ -135,37 +135,40 @@ cols_w_na
 # nyc_squirrels$zip_codes
 nyc_squirrels <- select(nyc_squirrels, -c(color_notes, zip_codes)) # column names without ""!
 
+########## I order to analize the squirrels behavior vs time of year, I chose to create 4 bins 
+########## corresponding to the 4 seasons.
+########## Using climate data for New York City from:
+########## https://en.wikipedia.org/wiki/New_York_City#Climate
+########## I assigned the different months to seasons using average high and average low temps as follows:
+##########  1  2  3  4  5  6  7  8  9  10  11  12
+##########  w  w  w  g  g  s  s  s  f  f   f   w
 
-########## I'M HERE!!!!!!!!!!!!!!!!!!
+library(lubridate) # to use function month
+
+season <- case_when(month(nyc_squirrels$date) == 1 ~ 'Winter',
+                    month(nyc_squirrels$date) == 2 ~ 'Winter',
+                    month(nyc_squirrels$date) == 3 ~ 'Winter',
+                    month(nyc_squirrels$date) == 4 ~ 'Spring',
+                    month(nyc_squirrels$date) == 5 ~ 'Spring',
+                    month(nyc_squirrels$date) == 6 ~ 'Summer',
+                    month(nyc_squirrels$date) == 7 ~ 'Summer',
+                    month(nyc_squirrels$date) == 8 ~ 'Summer',
+                    month(nyc_squirrels$date) == 9 ~ 'Fall',
+                    month(nyc_squirrels$date) == 10 ~ 'Fall',
+                    month(nyc_squirrels$date) == 11 ~ 'Fall',
+                    month(nyc_squirrels$date) == 12 ~ 'Winter')
+
+nyc_squirrels$season <- season
+
+
 ########## 
-########## Continue with binning: for nyc_squirrels$date, create 4 bins == 4 seasons
+########## I'M HERE!!!!!!!!!!!!!!!!!!
 ########## 
 ########## Do I need any dummy_variables? I think not, but check..
 ########## 
 ########## With that I would complete the data wrangling step of my analysis.
 ########## 
 
-library(lubridate)
-
-seasons <- c('Spring', 'Summer', 'Fall', 'Winter')
-
-class(nyc_squirrels$date[1])
-
-month(nyc_squirrels$date[1])
-
-# seasons = []
-# 
-# for i in range(len(nyc_squirrels)):
-#   if month(nyc_squirrels$date[i]) in [3, 4, 5]:
-#   seasons.append('Spring')
-# if month(nyc_squirrels$date[i]) in [6, 7, 8]:
-#   seasons.append('Summer')
-# if month(nyc_squirrels$date[i]) in [9, 10, 11]:
-#   seasons.append('Fall')
-# if month(nyc_squirrels$date[i]) in [12, 1, 2]:
-#   seasons.append('Winter')
-# 
-# cbind(nyc_squirrels, seasons)
 
 
 # features:
