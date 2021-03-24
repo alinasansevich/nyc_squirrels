@@ -99,7 +99,7 @@ summary(nyc_squirrels$age)
 #        4     2568      330      121 
 
 ### First I tried this line, it will change '?' to NA, but it doesn't change the factor's level
-nyc_squirrels[nyc_squirrels$age == "?" ] <- NA
+# nyc_squirrels[nyc_squirrels$age == "?" ] <- NA
 
 ### So, I need to change the factor level from "?" to NA
 levels(nyc_squirrels$age)[levels(nyc_squirrels$age) == '?'] <- NA
@@ -158,28 +158,188 @@ season <- case_when(month(nyc_squirrels$date) == 1 ~ 'Winter',
                     month(nyc_squirrels$date) == 11 ~ 'Fall',
                     month(nyc_squirrels$date) == 12 ~ 'Winter')
 
-nyc_squirrels$season <- season
+nyc_squirrels$season <- season   # Now I have one more column
 
-
-########## 
-########## I'M HERE!!!!!!!!!!!!!!!!!!
-########## 
-########## Do I need any dummy_variables? I think not, but check..
 ########## 
 ########## With that I would complete the data wrangling step of my analysis.
 ########## 
 
-
+########## Now I'll start answering some questions:
 
 # features:
-#   # what coat + highlight is the most frequent? what species is that?
-#   # is there a correlation between age and fur color sighted?
-#   # for color and location >>> is it correlated? i.e., are cinnamon squirrels more
-#   # frequently seen in the park and grey squirrels in the city or viceversa or
-#   # is it unrelated? >>> that would mean different behaviors would be associated
-#   # with the species
-#   # fur color vs behavior >>> heatmap
-#   # age vs behavior >>> heatmap
+#   1.# what coat + highlight is the most frequent? what species is that?
+#   2.# is there a correlation between age and fur color sighted? what color are the juvenile squirrels?
+#   3.# for color and location >>> is it correlated? i.e., are cinnamon squirrels more
+#     # frequently seen in the park and grey squirrels in the city or viceversa or
+#     # is it unrelated? >>> that would mean different behaviors would be associated
+#     # with the species
+#   4.# fur color vs behavior >>> heatmap
+#   5.# age vs behavior >>> heatmap
+
+
+########## #   1.# what coat + highlight is the most frequent? what species is that?
+
+### First, I create a subdf called features_df:
+features_df <- subset(nyc_squirrels, select=c('age', 
+                                              'primary_fur_color', 
+                                              'highlight_fur_color', 
+                                              'combination_of_primary_and_highlight_color'))
+
+### Then, check for missing data:
+missing_feat <- is.na(features_df)
+summary(missing_feat)
+# age          primary_fur_color highlight_fur_color combination_of_primary_and_highlight_color
+# Mode :logical   Mode :logical     Mode :logical       Mode :logical                             
+# FALSE:2898      FALSE:2968        FALSE:1937          FALSE:3023                                
+# TRUE :125       TRUE :55          TRUE :1086
+
+# There are 55 NA values in "primary_fur_color", but none in "combination_of_primary_and_highlight_color"
+# why is that? what color is takes as default?
+
+prim_color_na <- which(is.na(features_df$primary_fur_color))  # indexes of NA values for primary_fur_color
+
+default_colors <- features_df$combination_of_primary_and_highlight_color[prim_color_na]
+summary(default_colors)
+# There is no "default color", for the combination_of_primary_and_highlight_color column, 
+# when data was not available, instead of NA there is a '+':
+prim_color_na_df <- features_df %>% filter((is.na(features_df$primary_fur_color)))
+
+# ##### the next 2 lines don't work, WHY???
+# nyc_squirrels[nyc_squirrels$combination_of_primary_and_highlight_color == "+" ] <- NA
+# features_df[features_df$combination_of_primary_and_highlight_color == "+" ] <- NA
+
+########## #   BACK TO: 1.# what coat + highlight is the most frequent? what species is that?
+
+### 2. Descriptive Statistics
+summary(features_df)
+# age         primary_fur_color     highlight_fur_color     combination_of_primary_and_highlight_color
+# Adult   :2568   Black   : 103     Cinnamon       : 767     Gray+               :895                  
+# Juvenile: 330   Cinnamon: 392     White          : 585     Gray+Cinnamon       :752                  
+# NA's    : 125   Gray    :2473     Cinnamon, White: 268     Gray+White          :489                  
+#                 NA's    :  55     Gray           : 170     Gray+Cinnamon, White:265                  
+#                                   Gray, White    :  59     Cinnamon+Gray       :162                  
+#                                   (Other)        :  88     Cinnamon+White      : 94                  
+#                                   NA's           :1086     (Other)             :366 
+
+# Gray is the most frequent fur color. To see this more clearly, let's make a plot:
+library(ggthemes)
+##### drop NA values from features_df$primary_fur_color:
+features_df_fur <- features_df %>% filter(!is.na(primary_fur_color))
+### plot primary_fur_color frequencies
+p <- ggplot(data=features_df_fur, aes(x=primary_fur_color, fill=primary_fur_color)) + 
+  geom_bar() + 
+  scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
+  labs(x="Primary Fur Color", y="Count") +
+  theme(legend.title = element_blank()) +
+  theme(legend.position="none") +  # is this line working? I don't think so...
+  theme_hc()
+
+p
+
+# black=#000000
+# cinnamon=#D2691E
+# gray=#808080
+
+# from:
+# https://www.nycgovparks.org/programs/rangers/wildlife-management/squirrels
+# The majority of squirrels in New York City are eastern grey squirrels.
+# Even the darker grey or black or brown-rusty colored squirrels are all eastern grey squirrels! 
+# Squirrels are mostly active during the daytime.
+
+########## 2
+#   2.# what color are the juvenile squirrels? is there a correlation between age and fur color sighted? 
+
+# extract data for young squirrels
+young <- features_df %>% filter(age == 'Juvenile')
+# drop NAs
+young <- young %>% filter(!is.na(primary_fur_color))
+### plot primary_fur_color frequencies
+p <- ggplot(data=young, aes(x=primary_fur_color, fill=primary_fur_color)) + 
+  geom_bar() + 
+  scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
+  labs(x="Primary Fur Color", y="Count") +
+  theme(legend.title = element_blank()) +
+  theme(legend.position="none") +  # is this line working? I don't think so...
+  theme_hc()
+
+p
+summary(features_df_fur$primary_fur_color)
+# Black Cinnamon     Gray 
+# 103      392     2473 
+
+summary(young$primary_fur_color)
+# Black Cinnamon     Gray 
+# 8       58      256 
+
+# 8/322
+# 58/322
+# 256/322
+# 
+# 103/2968
+# 398/2968
+# 2473/2968
+
+# The color frequencies for young squirrels is very similar to the overall group
+# plot adults? should I include this or should I remove n2 completely?
+
+########## 3
+########## 
+########## I'm here!
+########## 
+
+#   3.# for color and location >>> is it correlated? i.e., are cinnamon squirrels more
+#     # frequently seen in the park and grey squirrels in the city or viceversa or
+#     # is it unrelated? >>> that would mean different behaviors would be associated
+#     # with the species
+
+
+
+
+### 3. age
+# I see that 84% of sighted squirrels where adults and only 10% where juvenile
+features_df[features_df == "?" ] <- NA  # change '?' to NA
+summary(features_df$age)
+# create bar plot to show age frequencies:
+library(ggthemes)
+p <- ggplot(data=features_df, aes(x=age)) +
+  geom_bar(color="black", fill="#000000") +
+  theme_hc()
+
+p
+### 4. coat colors
+
+df[!is.na(df$B), ]
+
+
+
+
+
+
+
+
+### ToDo: remove NA values
+ggplot(data=features_df, aes(x=highlight_fur_color)) + geom_bar(color="black", fill="grey") # rearrange variables, change colors
+ggplot(data=features_df, aes(x=primary_fur_color)) + geom_bar(color="black", fill="beige")
+
+ggplot(data=behavior_df, aes(x=age)) + geom_bar(color="black", fill="blue")
+
+behavior_freq <- summary(behavior_df)
+behavior_freq
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -384,6 +544,20 @@ behavior_freq
 
 
 
+################ themes...
+# theme_fivethirtyeight() # >>> this theme changes the x and y labels, and takes the column name for the x label
+# theme_economist() # >>> this theme places the legend above, doesn't look good either
+# theme_tufte() # >>> maybe?... Times New Roman fonts...
+# theme_stata() # this one gives too much importance to the label...
+# theme_hc() # this one is a keeper! :) BUT I need to change the legend's name...
+
+# https://www.datanovia.com/en/blog/ggplot-themes-gallery/
+
+
+# theme_tufte(): a minimalist theme
+# theme_economist(): theme based on the plots in the economist magazine
+# theme_stata(): theme based on stata graph schemes.
+# theme_hc(): theme based on Highcharts JS
 
 
 
