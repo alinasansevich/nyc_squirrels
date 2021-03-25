@@ -230,6 +230,7 @@ p <- ggplot(data=features_df_fur, aes(x=primary_fur_color, fill=primary_fur_colo
   geom_bar() + 
   scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
   labs(x="Primary Fur Color", y="Count") +
+  ggtitle("Primary Fur Color") +
   theme(legend.title = element_blank()) +
   theme(legend.position="none") +  # is this line working? I don't think so...
   theme_hc()
@@ -258,6 +259,7 @@ p <- ggplot(data=young, aes(x=primary_fur_color, fill=primary_fur_color)) +
   geom_bar() + 
   scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
   labs(x="Primary Fur Color", y="Count") +
+  ggtitle("Juvenile Squirrels Primary Fur Color") +
   theme(legend.title = element_blank()) +
   theme(legend.position="none") +  # is this line working? I don't think so...
   theme_hc()
@@ -280,56 +282,63 @@ summary(young$primary_fur_color)
 # 2473/2968
 
 # The color frequencies for young squirrels is very similar to the overall group
-# plot adults? should I include this or should I remove n2 completely?
+# plot adults? should I include this or should I remove #2 completely? it doesn't add anything...
 
-########## 3
-########## 
+########## let's have a look at the highlights:
+### remove NAs
+features_df_fur_h <- features_df %>% filter(!is.na(highlight_fur_color))
+
+p <- ggplot(data=features_df_fur_h, aes(x=highlight_fur_color, fill=highlight_fur_color)) + 
+  geom_bar() + 
+  labs(x="Highlight Colors", y="Count") +
+  ggtitle("Fur Highlight Colors") +
+  theme(legend.title = element_blank()) +
+  coord_flip() +
+  theme_hc()
+
+p
+# OK! Now I have an interesting plot! But I need to rename a few things, otherwise all labels
+# in it will look too confusing >>> NEEDS MORE WORK!
+
+
+########## and what about the combinations? let's take a look:
+p <- ggplot(data=features_df_fur, aes(x=combination_of_primary_and_highlight_color,
+                                      fill=combination_of_primary_and_highlight_color)) + 
+  geom_bar() + 
+  labs(x="Color Combinations", y="Count") +
+  ggtitle("Primary and Highlight Color Combined") +
+  theme(legend.title = element_blank()) +
+  theme(legend.position="none") +  # is this line working? I don't think so...
+  coord_flip() +
+  theme_hc()
+
+p
+# OK! Now I have an interesting plot! But I need to rename a few things, otherwise all labels
+# in it will look too confusing >>> NEEDS MORE WORK!
+
+### 3. age
+summary(features_df$age)
+# Adult Juvenile     NA's 
+#     2568      330      125
+# I see that 84% of sighted squirrels where adults and only 10% where juvenile
+
+# create bar plot to show age frequencies:
+p <- ggplot(data=features_df, aes(x=age)) +
+  geom_bar() +
+  theme_hc()
+
+p
+
+
 ########## I'm here!
+
+
 ########## 
 
 #   3.# for color and location >>> is it correlated? i.e., are cinnamon squirrels more
 #     # frequently seen in the park and grey squirrels in the city or viceversa or
 #     # is it unrelated? >>> that would mean different behaviors would be associated
-#     # with the species
-
-
-
-
-### 3. age
-# I see that 84% of sighted squirrels where adults and only 10% where juvenile
-features_df[features_df == "?" ] <- NA  # change '?' to NA
-summary(features_df$age)
-# create bar plot to show age frequencies:
-library(ggthemes)
-p <- ggplot(data=features_df, aes(x=age)) +
-  geom_bar(color="black", fill="#000000") +
-  theme_hc()
-
-p
-### 4. coat colors
-
-df[!is.na(df$B), ]
-
-
-
-
-
-
-
-
-### ToDo: remove NA values
-ggplot(data=features_df, aes(x=highlight_fur_color)) + geom_bar(color="black", fill="grey") # rearrange variables, change colors
-ggplot(data=features_df, aes(x=primary_fur_color)) + geom_bar(color="black", fill="beige")
-
-ggplot(data=behavior_df, aes(x=age)) + geom_bar(color="black", fill="blue")
-
-behavior_freq <- summary(behavior_df)
-behavior_freq
-
-
-
-
-
+#     # with the species???
 
 
 
@@ -358,13 +367,6 @@ location_df <- subset(nyc_squirrels, select=c('long', 'lat', 'lat_long',
                                               'police_precincts')) 
 ##### I dropped 2 columns: 'specific_location' and zip_codes', 
 ##### because they have mostly NA values.
-
-
-features_df <- subset(nyc_squirrels, select=c('age', 
-                                              'primary_fur_color', 
-                                              'highlight_fur_color', 
-                                              'combination_of_primary_and_highlight_color'))
-##### I dropped 'color_notes' column because it's not of much use, mostly NA values.
 
 
 behavior_df <- subset(nyc_squirrels, select=c('running', 'chasing', 'climbing',
