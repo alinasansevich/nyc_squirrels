@@ -18,8 +18,10 @@
 #########################################################
 
 library(readr)
-library(ggplot2)
 library(dplyr)
+library(lubridate) # to use function month
+library(ggplot2)
+library(ggthemes)
 
 ##### 1) load the dataset
 nyc_squirrels <- read.csv('nyc_squirrels.csv')
@@ -143,8 +145,6 @@ nyc_squirrels <- select(nyc_squirrels, -c(color_notes, zip_codes)) # column name
 ##########  1  2  3  4  5  6  7  8  9  10  11  12
 ##########  w  w  w  g  g  s  s  s  f  f   f   w
 
-library(lubridate) # to use function month
-
 season <- case_when(month(nyc_squirrels$date) == 1 ~ 'Winter',
                     month(nyc_squirrels$date) == 2 ~ 'Winter',
                     month(nyc_squirrels$date) == 3 ~ 'Winter',
@@ -222,7 +222,7 @@ summary(features_df)
 #                                   NA's           :1086     (Other)             :366 
 
 # Gray is the most frequent fur color. To see this more clearly, let's make a plot:
-library(ggthemes)
+
 ##### drop NA values from features_df$primary_fur_color:
 features_df_fur <- features_df %>% filter(!is.na(primary_fur_color))
 ### plot primary_fur_color frequencies
@@ -316,6 +316,21 @@ p
 # OK! Now I have an interesting plot! But I need to rename a few things, otherwise all labels
 # in it will look too confusing >>> NEEDS MORE WORK!
 
+###### for the colors "Black+Gray, White" there's no bar in the plot
+###### I want to see how many have those colors (or if there's a mistake)
+which(features_df$combination_of_primary_and_highlight_color == 'Black+Gray, White')
+# out: 1345  >>> index of the row I'm looking for, there's only 1!
+
+features_df[1345,]   # no issues here, it's just 1 squirrel
+#         age      primary_fur_color    highlight_fur_color   combination_of_primary_and_highlight_color
+# 1345 Juvenile             Black         Gray, White           Black+Gray, White
+                        
+which(features_df$combination_of_primary_and_highlight_color == 'Cinnamon+Black, White')
+# out: 1198 2761 2801   # only 3 squirrels in this case
+
+
+
+
 ### 3. age
 summary(features_df$age)
 # Adult Juvenile     NA's 
@@ -330,7 +345,6 @@ p <- ggplot(data=features_df, aes(x=age)) +
 p
 
 
-########## I'm here!
 
 
 ########## 
@@ -340,33 +354,105 @@ p
 #     # is it unrelated? >>> that would mean different behaviors would be associated
 #     # with the species???
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# I create 4 subsets based on category: location, features, behavior and time.
+# Create location_df 
 location_df <- subset(nyc_squirrels, select=c('long', 'lat', 'lat_long',
                                               'hectare', 'location', 
                                               'above_ground_sighter_measurement', 
                                               'community_districts', 
                                               'borough_boundaries', 
                                               'city_council_districts', 
-                                              'police_precincts')) 
-##### I dropped 2 columns: 'specific_location' and zip_codes', 
-##### because they have mostly NA values.
+                                              'police_precincts'))
+
+names(location_df)
+# "long"  "lat"   "lat_long"                         
+
+# "hectare"
+# ID tag, which is derived from the hectare grid used to divide
+# and count the park area. One axis that runs predominantly north-to-south is numerical
+# (1-42), and the axis that runs predominantly east-to-west is roman characters (A-I).
+
+# "location"
+# Value is either "Ground Plane" or "Above Ground." Sighters were instructed to
+# indicate the location of where the squirrel was when first sighted.
+
+# "above_ground_sighter_measurement"
+# For squirrel sightings on the ground plane, 
+# fields were populated with a value of “FALSE.”
+
+# "community_districts"              "borough_boundaries"              
+# "city_council_districts"           "police_precincts" 
+
+summary(location_df$hectare) # this is pointless! XD
+# 14D     32E     14E     01B     07H     13D     13E     03D     04C     33E     02C 
+# 32      30      28      27      26      25      24      22      22      22      21 
+# 03B     03F     08I     10G     12F     30B     36I     38C     05C     07F     16E 
+# 21      21      21      21      21      21      21      21      20      20      20 
+# 35A     09B     16D     32C     04D     08B     15G     33B     02B     02F     03E 
+# 20      19      19      19      18      18      18      18      17      17      17 
+# 15F     20F     38E     40B     01D     05E     07G     09A     09I     22C     41B 
+# 17      17      17      17      16      16      16      16      16      16      16 
+# 02A     06A     07B     08H     09H     10F     14F     15E     22F     32D     32F 
+# 15      15      15      15      15      15      15      15      15      15      15 
+# 37G     40C     12E     15D     17E     32A     33I     35C     37E     40D     03H 
+# 15      15      14      14      14      14      14      14      14      14      13 
+# 03I     11B     11D     11H     15I     17F     20B     01C     02E     04E     05F 
+# 13      13      13      13      13      13      13      12      12      12      12 
+# 06C     08D     09F     12G     14H     18I     21B     21D     22B     33D     36F 
+# 12      12      12      12      12      12      12      12      12      12      12 
+# 38F     01A     03A     04A     04B     05D     07E     11E     14B     18C     21F 
+# 12      11      11      11      11      11      11      11      11      11      11 
+# (Other) 
+# 1423 
+
+class(location_df$hectare) # "factor"
+hectare <- as.character(location_df$hectare) # 
+summary(hectare) # useless
+
+hect <- location_df %>% arrange(hectare) %>% sum()
+
+str(location_df$hectare)
+# Factor w/ 339 levels "01A","01B","01C",..: 292 291 14 40 306 258 52 271 56 246 ...
+
+levels(location_df$hectare)
+summary_hect <- summary(location_df$hectare)
+
+hist(summary_hect)   
+
+
+
+########## I'm here!
+# I'm trying to find how many of each hectare squares, == where are the squirrels more
+# frequently seen?
+
+
+
+
+
+
+
+
+### check this out:
+# https://www.jessesadler.com/post/geocoding-with-r/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 behavior_df <- subset(nyc_squirrels, select=c('running', 'chasing', 'climbing',
@@ -384,93 +470,7 @@ summary(time_df)  #  AM:1347 - PM:1676
 
 
 
-### ToDo: remove NA values and run the summaries again >>> Y/N?
 
-summary(location_df)
-
-summary(behavior_df)
-
-#########################################################
-### I start working with the features_df:
-
-### 1. Check for missing data:
-missing_feat <- is.na(features_df)
-summary(missing_feat)
-# age          primary_fur_color highlight_fur_color
-# Mode :logical   Mode :logical     Mode :logical      
-# FALSE:2898      FALSE:2968        FALSE:1937         
-# TRUE :125       TRUE :55          TRUE :1086         
-# combination_of_primary_and_highlight_color
-# Mode :logical                             
-# FALSE:3023  
-### I find missing values in all columns,
-### but (at least for now) I choose not to drop anything.
-
-### 2. Descriptive Statistics
-summary(features_df)
-# age       primary_fur_color      highlight_fur_color
-# ?       :   0   Black   : 103     Cinnamon       : 767    
-# Adult   :2568   Cinnamon: 392     White          : 585    
-# Juvenile: 330   Gray    :2473     Cinnamon, White: 268    
-# NA's    : 125   NA's    :  55     Gray           : 170    
-#                                   Gray, White    :  59    
-#                                   (Other)        :  88    
-#                                   NA's           :1086    
-#  combination_of_primary_and_highlight_color
-#  Gray+               :895                  
-#  Gray+Cinnamon       :752                  
-#  Gray+White          :489                  
-#  Gray+Cinnamon, White:265                  
-#  Cinnamon+Gray       :162                  
-#  Cinnamon+White      : 94                  
-#  (Other)             :366  
-
-
-### 3. age
-# I see that 84% of sighted squirrels where adults and only 10% where juvenile
-features_df[features_df == "?" ] <- NA  # change '?' to NA
-summary(features_df$age)
-# create bar plot to show age frequencies:
-library(ggthemes)
-p <- ggplot(data=features_df, aes(x=age)) +
-  geom_bar(color="black", fill="#000000") +
-  theme_hc()
-
-p
-### 4. coat colors
-
-df[!is.na(df$B), ]
-
-##### drop NA values from features_df$primary_fur_color:
-features_df_fur_na <- features_df %>% filter(!is.na(primary_fur_color))
-### plot primary_fur_color frequencies
-p <- ggplot(data=features_df_fur_na, aes(x=primary_fur_color, fill=primary_fur_color)) + 
-  geom_bar() + 
-  scale_fill_manual(values=c("#000000", "#D2691E", "#808080")) + 
-  labs(x="Primary Fur Color", y="Count") +
-  theme(legend.position="none") + # + labs(fill = "Primary Fur Color")
-  theme_hc() ##### ToDo: change the legend's name! Or remove legend!
-
-p
-################ themes...
-# theme_fivethirtyeight() # >>> this theme changes the x and y labels, and takes the column name for the x label
-# theme_economist() # >>> this theme places the legend above, doesn't look good either
-# theme_tufte() # >>> maybe?... Times New Roman fonts...
-# theme_stata() # this one gives too much importance to the label...
-# theme_hc() # this one is a keeper! :) BUT I need to change the legend's name...
-
-# https://www.datanovia.com/en/blog/ggplot-themes-gallery/
-
-
-# theme_tufte(): a minimalist theme
-# theme_economist(): theme based on the plots in the economist magazine
-# theme_stata(): theme based on stata graph schemes.
-# theme_hc(): theme based on Highcharts JS
-
-
-# black=#000000
-# cinnamon=#D2691E
-# gray=#808080
 
   
 
@@ -478,14 +478,7 @@ p
 
 
 
-### ToDo: remove NA values
-ggplot(data=features_df, aes(x=highlight_fur_color)) + geom_bar(color="black", fill="grey") # rearrange variables, change colors
-ggplot(data=features_df, aes(x=primary_fur_color)) + geom_bar(color="black", fill="beige")
 
-ggplot(data=behavior_df, aes(x=age)) + geom_bar(color="black", fill="blue")
-
-behavior_freq <- summary(behavior_df)
-behavior_freq
 
 # plot:
 #   bar plot:
