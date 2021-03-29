@@ -382,7 +382,7 @@ names(location_df)
 # "community_districts"              "borough_boundaries"              
 # "city_council_districts"           "police_precincts" 
 
-summary(location_df$hectare) # this is pointless! XD
+summary(location_df$hectare) # this is pointless! ...or maybe not?... NOT AT ALL!!!
 # 14D     32E     14E     01B     07H     13D     13E     03D     04C     33E     02C 
 # 32      30      28      27      26      25      24      22      22      22      21 
 # 03B     03F     08I     10G     12F     30B     36I     38C     05C     07F     16E 
@@ -405,19 +405,50 @@ summary(location_df$hectare) # this is pointless! XD
 # 1423 
 
 class(location_df$hectare) # "factor"
-hectare <- as.character(location_df$hectare) # 
-summary(hectare) # useless
 
-hect <- location_df %>% arrange(hectare) %>% sum()
+most_freq_h <- summary(location_df$hectare)
+most_freq_h[1:10]
+# 14D 32E 14E 01B 07H 13D 13E 03D 04C 33E 
+# 32  30  28  27  26  25  24  22  22  22   >>> use this numbers as markers, get the lat-long
+### for each sighting, then place on map. What else could I add to the popup? :) <3
 
-str(location_df$hectare)
-# Factor w/ 339 levels "01A","01B","01C",..: 292 291 14 40 306 258 52 271 56 246 ...
+hect_14D <- nyc_squirrels$hectare == '14D'
 
-levels(location_df$hectare)
-summary_hect <- summary(location_df$hectare)
-
-hist(summary_hect)   
-
+most_sightings <- nyc_squirrels$lat_long[hect_14D]
+most_sightings
+# [1] POINT (-73.9712318712643 40.7773053099657)   
+# [2] POINT (-73.9708969246276 40.7767695507462)   
+# [3] POINT (-73.9713330594434 40.7771924214236)   
+# [4] POINT (-73.9707197274481 40.7773956803431)   
+# [5] POINT (-73.970720187655 40.7774564799983)    
+# [6] POINT (-73.9709104380323 40.7769096957616)   
+# [7] POINT (-73.9714921188372 40.776758371867)    
+# [8] POINT (-73.9707900566519 40.7771670550089)   
+# [9] POINT (-73.9714089647431 40.7767916587915)   
+# [10] POINT (-73.9709817796369 40.7773554311586)   
+# [11] POINT (-73.9709207551033 40.7767932008037)   
+# [12] POINT (-73.9709534894049 40.7765964740768)   
+# [13] POINT (-73.9708782966369 40.77694686696301)  
+# [14] POINT (-73.9709722223794 40.7767329646325)   
+# [15] POINT (-73.9708860879459 40.7768376656119)   
+# [16] POINT (-73.9709407456459 40.776423522087)    
+# [17] POINT (-73.970962498391 40.7766899040856)    
+# [18] POINT (-73.9708108312271 40.7773975776146)   
+# [19] POINT (-73.9714637683084 40.7768984561563)   
+# [20] POINT (-73.9708371806429 40.7764813666684)   
+# [21] POINT (-73.9711810222421 40.7773445611969)   
+# [22] POINT (-73.9702420100291 40.7772720889907)   
+# [23] POINT (-73.9709738166531 40.7774102689734)   
+# [24] POINT (-73.97105314852982 40.777375706944504)
+# [25] POINT (-73.9708225719705 40.7772497804149)   
+# [26] POINT (-73.9709797467807 40.7769095710679)   
+# [27] POINT (-73.9704679459444 40.7773384236212)   
+# [28] POINT (-73.9714295102249 40.776954371947)    
+# [29] POINT (-73.9713680837672 40.77716615083641)  
+# [30] POINT (-73.97063044051 40.7771060594808)     
+# [31] POINT (-73.9710273070712 40.7766521246153)   
+# [32] POINT (-73.9703421391442 40.7773706575356)   
+# 3023 Levels: POINT (-73.9497217674555 40.796517007214) ...
 
 
 ########## I'm here!
@@ -435,13 +466,23 @@ hist(summary_hect)
 # https://www.jessesadler.com/post/geocoding-with-r/
 
 
+############################# Intermezzo: maps! ################################ 
 
+# https://rstudio.github.io/leaflet/
+# https://rstudio.github.io/leaflet/map_widget.html
 
+################################################################################ 
 
+# New York City's Central Park Coordinates: 
+# 40.785091° N, -73.968285° W
 
+install.packages("leaflet")
+library(leaflet)
 
-
-
+ny_map <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-73.968285, lat=40.785091, popup="NYC")
+ny_map  # Print the map
 
 
 
