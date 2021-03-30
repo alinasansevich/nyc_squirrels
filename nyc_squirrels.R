@@ -92,7 +92,7 @@ nyc_squirrels$date <- new_date
 
 ### finally, change data type from 'Character' to 'Date'
 nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%m/%d/%Y")
-# class(nyc_squirrels$date) # "Date"
+class(nyc_squirrels$date) # "Date"
 
 ########## For nyc_squirrels$age, I need to unify formats, "?" + NAs = NAs
 class(nyc_squirrels$age) # factor, Levels: ? Adult Juvenile
@@ -479,18 +479,24 @@ most_sightings
 install.packages("leaflet")
 library(leaflet)
 
+### SUPER BASIC NYC MAP, REMOVE LATER:
 ny_map <- leaflet() %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(lng=-73.968285, lat=40.785091, popup="NYC")
 ny_map  # Print the map
 
+### plot location of all squirrels sighted, with markers showing time (am/pm)
+ny_map <- leaflet(data=nyc_squirrels) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=~long, lat=~lat, popup= ~as.character(shift))
+ny_map
 
+### I'm here!!! :)
+# https://rstudio.github.io/leaflet/markers.html
 
-
-
-
-
-
+# change colors, am/pm
+# juvenile/adult
+# behavior...
 
 
 
