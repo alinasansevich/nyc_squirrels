@@ -479,17 +479,41 @@ most_sightings
 install.packages("leaflet")
 library(leaflet)
 
+############################# 
 ### SUPER BASIC NYC MAP, REMOVE LATER:
 ny_map <- leaflet() %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(lng=-73.968285, lat=40.785091, popup="NYC")
 ny_map  # Print the map
+############################# 
 
-### plot location of all squirrels sighted, with markers showing time (am/pm)
+### plot location of all squirrels sighted, with markers showing all sightings
 ny_map <- leaflet(data=nyc_squirrels) %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addMarkers(lng=~long, lat=~lat, popup= ~as.character(shift))
 ny_map
+
+
+### plot location of all squirrels sighted, markers show shift (am/pm)
+color_icons <- icons(
+  iconUrl = ifelse(as.character(nyc_squirrels$shift) == "AM",
+                   "/home/alina/Learning_to_Code/My_Projects/NYC_squirrels/icons8-blue_marker-40.png",
+                   "/home/alina/Learning_to_Code/My_Projects/NYC_squirrels/icons8-red_marker-40.png"),
+  iconWidth = 20, iconHeight = 45   # 38 / 95
+)
+
+# /home/alina/Learning_to_Code/My_Projects/NYC_squirrels/icons8-blue_marker-40.png
+# /home/alina/Learning_to_Code/My_Projects/NYC_squirrels/icons8-red_marker-40.png
+
+ny_map <- leaflet(data=nyc_squirrels) %>%
+  addTiles() %>%
+  addMarkers(lng=~long, lat=~lat, icon=color_icons)
+ny_map # this is crashing my RStudio! I need to find better icons!
+
+
+# found new icons at
+# https://icons8.com/icons/set/marker--static
+
 
 ### I'm here!!! :)
 # https://rstudio.github.io/leaflet/markers.html
