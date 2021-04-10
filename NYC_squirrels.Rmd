@@ -1,0 +1,83 @@
+---
+title: "NYC_squirrels"
+author: "Alina Sansevich"
+date: "April 10, 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# New York City Squirrels Census
+
+I got the idea for this analysis from: https://www.springboard.com/blog/15-fun-datasets-to-analyze/
+
+@@@@@ TO-DO:
+WRITE ABOUT THE SQUIRRELS CENSUS = WHERE DOES THIS DATASET COME FROM
+https://www.thesquirrelcensus.com/
+
+This is my first data analysis project with R, and also my first R Markdown document.
+
+```{r}
+library(readr)
+library(dplyr)
+library(lubridate) # to use function month
+library(ggplot2)
+library(ggthemes)
+```
+
+Let's start by loading the dataset, and creating the dataframe nyc_squirrels:
+
+```{r}
+# 1) load the dataset
+nyc_squirrels <- read.csv('nyc_squirrels.csv')
+```
+
+## Data Wrangling: 
+```{r}
+# 2) check str, stats, NAs, data types...
+str(nyc_squirrels)
+```
+
+As `str(nyc_squirrels)` shows @@@@@, this dataset contains data that could be classified as belonging to 1 of 4 different categories:
+
+* location (_where were the squirrels sighted/seen?_), 
+* features (_what did the squirrels look like?_, _how old were they?_),
+* behavior (_what were they doing?_),
+* time (_when were they sighted/seen?_).
+
+I will organize my analysis around these 4 categories of information. 
+
+The date column's data type is Integer, I will change it to 'Date'.
+```{r}
+# change nyc_squirrels$date data type to character
+nyc_squirrels$date <- as.character(nyc_squirrels$date)
+
+# define function add_slash: takes the date in format: "10142018" (class Character)
+# and returns it in format: "10/14/2018" (class Character) 
+add_slash <- function(x){
+  day <- substr(x, 3, 4)
+  month <- substr(x, 1, 2)
+  year <- substr(x, 5, 8)
+  return <- paste(month, day, year, sep="/")
+}
+# change each date value with apply add_slash
+new_date <- apply(nyc_squirrels[,6,drop=F], 1, add_slash)
+nyc_squirrels$date <- new_date
+# finally, change data type from 'Character' to 'Date'
+nyc_squirrels$date <- as.Date(nyc_squirrels$date, "%m/%d/%Y")
+```
+
+In the age column there are "?" values and NAs. This column is a factor, so "?" is a level,
+this means that `nyc_squirrels[nyc_squirrels$age == "?" ] <- NA` doesn't change the factor's level. So, to change the factor's level from "?" to NA:
+
+```{r}
+levels(nyc_squirrels$age)[levels(nyc_squirrels$age) == '?'] <- NA
+summary(nyc_squirrels$age)
+```
+
+
+
+
+

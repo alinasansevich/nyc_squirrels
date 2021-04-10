@@ -109,7 +109,7 @@ summary(nyc_squirrels$age)
 #    Adult Juvenile     NA's 
 #     2568      330      125 
 
-
+### @@@@@@@@@@@@@@@@ R Markdown >>> I'm here!
 ### find which columns have NA values, and count them
 na_totals <- colSums(is.na(nyc_squirrels))  # I could also use: sapply(nyc_squirrels, function(x) sum(is.na(x)))
 index <- na_totals != 0
@@ -624,6 +624,44 @@ summary(time_df)  #  AM:1347 - PM:1676
 # theme_economist(): theme based on the plots in the economist magazine
 # theme_stata(): theme based on stata graph schemes.
 # theme_hc(): theme based on Highcharts JS
+
+
+
+################ ################ ################ ################ 
+################ ################ ################ ################ 
+################ ################ ################ ################ 
+
+# when trying to knit for the first time, I got this error message:
+#   Error: pandoc version 1.12.3 or higher is required and was not found (see the help page ?rmarkdown::pandoc_available).
+# Execution halted
+# 
+# 
+# >pandoc -v
+# Error: object 'pandoc' not found
+# > install.packages(pandoc)
+# Error in install.packages : object 'pandoc' not found
+# > Sys.getenv("RSTUDIO_PANDOC")
+# [1] "/home/alina/anaconda3/envs/r-env/bin/pandoc"
+# > pandoc_available()
+# Error in pandoc_available() : could not find function "pandoc_available"
+# > pandoc_version()
+# Error in pandoc_version() : could not find function "pandoc_version"
+# 
+# 
+# from:
+#   https://stackoverflow.com/questions/28432607/pandoc-version-1-12-3-or-higher-is-required-and-was-not-found-r-shiny
+# > Sys.getenv("RSTUDIO_PANDOC")
+# [1] "/home/alina/anaconda3/envs/r-env/bin/pandoc"
+# 
+# Sys.setenv(RSTUDIO_PANDOC="--- insert directory here ---")
+# 
+# Sys.setenv(RSTUDIO_PANDOC="/home/alina/anaconda3/envs/r-env/bin/pandoc")
+# >>> I DID NOT TRY THIS, GOT SCARED...
+# 
+# from:
+#   https://stackoverflow.com/questions/43215191/rmarkdown-not-working-due-to-pandoc/49058294
+# sudo apt-get install pandoc >>> I tried this within r-env
+# AND IT WORKED!!! :)
 
 
 
