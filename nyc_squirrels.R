@@ -406,61 +406,101 @@ summary(location_df$hectare) # this is pointless! ...or maybe not?... NOT AT ALL
 
 class(location_df$hectare) # "factor"
 
-most_freq_h <- summary(location_df$hectare)
+most_freq_h <- summary(nyc_squirrels$hectare)
 most_freq_h[1:10]
 # 14D 32E 14E 01B 07H 13D 13E 03D 04C 33E 
-# 32  30  28  27  26  25  24  22  22  22   >>> use this numbers as markers, get the lat-long
-### for each sighting, then place on map. What else could I add to the popup? :) <3
+# 32  30  28  27  26  25  24  22  22  22   >>> use this numbers as markers, 
+### get the lat-long for each sighting, 
+### then place on map. What can be found at this spots? Are these the most/least visited areas of the park?
+### are there any behaviours associated with theses spots? (for example, are they eating here?)
 
+# the values in the 'hectare' column are of class 'factor':
+class(nyc_squirrels$hectare[1]) # "factor"
+
+# create filters to get each one of the top 10 locations:
 hect_14D <- nyc_squirrels$hectare == '14D'
+hect_32E <- nyc_squirrels$hectare == '32E'
+hect_14E <- nyc_squirrels$hectare == '14E'
+hect_01B <- nyc_squirrels$hectare == '01B'
+hect_07H <- nyc_squirrels$hectare == '07H'
+hect_13D <- nyc_squirrels$hectare == '13D'
+hect_13E <- nyc_squirrels$hectare == '13E'
+hect_03D <- nyc_squirrels$hectare == '03D'
+hect_04C <- nyc_squirrels$hectare == '04C'
+hect_33E <- nyc_squirrels$hectare == '33E'
 
-most_sightings <- nyc_squirrels$lat_long[hect_14D]
-most_sightings
-# [1] POINT (-73.9712318712643 40.7773053099657)   
-# [2] POINT (-73.9708969246276 40.7767695507462)   
-# [3] POINT (-73.9713330594434 40.7771924214236)   
-# [4] POINT (-73.9707197274481 40.7773956803431)   
-# [5] POINT (-73.970720187655 40.7774564799983)    
-# [6] POINT (-73.9709104380323 40.7769096957616)   
-# [7] POINT (-73.9714921188372 40.776758371867)    
-# [8] POINT (-73.9707900566519 40.7771670550089)   
-# [9] POINT (-73.9714089647431 40.7767916587915)   
-# [10] POINT (-73.9709817796369 40.7773554311586)   
-# [11] POINT (-73.9709207551033 40.7767932008037)   
-# [12] POINT (-73.9709534894049 40.7765964740768)   
-# [13] POINT (-73.9708782966369 40.77694686696301)  
-# [14] POINT (-73.9709722223794 40.7767329646325)   
-# [15] POINT (-73.9708860879459 40.7768376656119)   
-# [16] POINT (-73.9709407456459 40.776423522087)    
-# [17] POINT (-73.970962498391 40.7766899040856)    
-# [18] POINT (-73.9708108312271 40.7773975776146)   
-# [19] POINT (-73.9714637683084 40.7768984561563)   
-# [20] POINT (-73.9708371806429 40.7764813666684)   
-# [21] POINT (-73.9711810222421 40.7773445611969)   
-# [22] POINT (-73.9702420100291 40.7772720889907)   
-# [23] POINT (-73.9709738166531 40.7774102689734)   
-# [24] POINT (-73.97105314852982 40.777375706944504)
-# [25] POINT (-73.9708225719705 40.7772497804149)   
-# [26] POINT (-73.9709797467807 40.7769095710679)   
-# [27] POINT (-73.9704679459444 40.7773384236212)   
-# [28] POINT (-73.9714295102249 40.776954371947)    
-# [29] POINT (-73.9713680837672 40.77716615083641)  
-# [30] POINT (-73.97063044051 40.7771060594808)     
-# [31] POINT (-73.9710273070712 40.7766521246153)   
-# [32] POINT (-73.9703421391442 40.7773706575356)   
-# 3023 Levels: POINT (-73.9497217674555 40.796517007214) ...
+# create df with only hectare, lat and long columns for each hectare value:
+locations_coord_14D <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_14D)
+locations_coord_32E <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_32E)
+# add to top 10 locations df:
+top_10_coordinates <- rbind(locations_coord_14D, locations_coord_32E)
 
+locations_coord_14E <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_14E)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_14E)
 
-########## I'm here!
-# I'm trying to find how many of each hectare squares, == where are the squirrels more
-# frequently seen?
+locations_coord_01B <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_01B)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_01B)
 
+locations_coord_13D <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_13D)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_13D)
 
+locations_coord_13E <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_13E)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_13E)
 
+locations_coord_03D <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_03D)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_03D)
 
+locations_coord_04C <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_04C)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_04C)
 
+# and the last one:
+locations_coord_33E <- nyc_squirrels %>%
+  select(hectare, lat, long) %>%
+  filter(hect_33E)
+top_10_coordinates <- rbind(top_10_coordinates, locations_coord_33E)
 
+    # this is an answer to: where were the squirrels more frequently seen?
+# so now I have the top 10 locations where squirrels where sighted, let's plot them:
 
+ny_map_top_10 <- leaflet(data=top_10_coordinates) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=~long, lat=~lat, popup= ~as.character(hectare))
+ny_map_top_10
+
+top_10_spots <- rbind(locations_coord_01B[1,], locations_coord_03D[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_04C[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_07H[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_13D[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_13E[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_14D[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_14E[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_32E[1,])
+top_10_spots <- rbind(top_10_spots, locations_coord_33E[1,])
+
+ny_top_10_spots <- leaflet(data=top_10_spots) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=~long, lat=~lat, popup= ~as.character(hectare))
+ny_top_10_spots  # @@@@@@@@@@@@@ ADD COLORS!!!
+
+########## READ ABOUT THE TOP 10 LOCATIONS:
+############ ARE THESE SPOTS FULL OF TURISTS?
+############ ARE THERE RESTAURANTS/EASY FOOD SPOTS THERE? ETC
 
 ### check this out:
 # https://www.jessesadler.com/post/geocoding-with-r/
